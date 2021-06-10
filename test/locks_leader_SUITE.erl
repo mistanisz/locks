@@ -296,8 +296,7 @@ with_trace(F, Config, Name) ->
     locks_ttb:trace_nodes([node()|Ns], Pats, Flags, [{file, Name}]),
     try F(Config)
     catch
-        error:R ->
-            Stack = erlang:get_stacktrace(),
+        error:R:Stack ->
             ttb_stop(),
             ct:log("Error ~p; Stack = ~p~n", [R, Stack]),
             erlang:error(R);
@@ -476,9 +475,9 @@ patch_net_kernel() ->
     locks_ttb:event({net_kernel, NewForms}),
     Res
     catch
-        error:What ->
+        error:What:Stack ->
             io:fwrite(user, "~p: ERROR:~p~n", [?LINE, What]),
-            error({What, erlang:get_stacktrace()})
+            error({What, Stack})
     end.
 
 xform_net_kernel({function,L,handle_call,3,Clauses}) ->

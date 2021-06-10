@@ -237,11 +237,11 @@ agent_init(Wait, Client, Options) ->
             ack(Wait, Client, {ok, self()}),
             try loop(St)
             catch
-                error:Error ->
+                error:Error:Stacktrace ->
                     error_logger:error_report(
                       [{?MODULE, aborted},
                        {reason, Error},
-                       {trace, erlang:get_stacktrace()}]),
+                       {trace, Stacktrace}]),
                     error(Error)
             end;
         Other ->
